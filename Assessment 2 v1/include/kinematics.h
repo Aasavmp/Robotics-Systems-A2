@@ -26,6 +26,7 @@ class Kinematics_c {
     float theta_back;
     float angle;
     float wheel_distance = 0.0878;
+    float target_angle;
 
   
     // Constructor, must exist.
@@ -95,29 +96,29 @@ class Kinematics_c {
     }
 
 
+    void targetangle(float targetx, float targety){
+        target_angle = atan2(targety - y, targetx - x);
+        if (target_angle < -PI){
+            target_angle += 2*PI;
+        }
+        else if (target_angle > PI){
+            target_angle -= 2*PI;
+        }
+    }
 
     void angletohome(){
         
         if (y> 0){
-
             theta_back = -theta - PI/2 - atan2(x , abs(y));
         }
-
         else if (y < 0){
-
             theta_back = -theta + PI/2 + atan2(x , abs(y));
-
         } 
         if (theta_back < -PI){
             theta_back += 2*PI;
-
-
         }
         else if (theta_back > PI){
             theta_back -= 2*PI;
-    
-
-
         }
     }
 
