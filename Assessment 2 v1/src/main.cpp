@@ -1,6 +1,5 @@
 #include <Arduino.h>
-#include <EEPROM.h>
-#include "SearchAlgorithms.h"
+#include "SearchAlgorithmsClass.h"
 #include "linesensor.h"
 #include "encoders.h"
 #include "kinematics.h"
@@ -16,10 +15,9 @@ unsigned long controltimestamp;
 #define SENSOR_DEAD_TIME 1000
 
 // Call the classes
-SearchAlgorithms searchAlgorithms;
+SearchAlgorithmsClass searchAlgorithms;
 LineSensorClass lineSensor;
 Kinematics_c kinematicsrun;
-// KinematicsClass kinematicsrun;
 
 // Store the number of waypoints found
 int numWaypointsFound = 0;
@@ -68,7 +66,7 @@ void loop() {
     kinematicsrun.update(count_leftenc, count_rightenc);
     // x, y, theta_1, total_distance = updateKinematics();
   }
-  
+
 
   
 
@@ -88,8 +86,8 @@ void storeWaypoints() {
     lastWaypointTime = millis();
 
     // Store the waypoint coordinates
-    // sensedWaypoints[numWaypointsFound].x = kinematicsrun.x;
-    // sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x;
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
 
   };
 

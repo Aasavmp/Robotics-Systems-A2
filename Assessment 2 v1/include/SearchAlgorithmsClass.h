@@ -3,15 +3,15 @@
 #include <math.h>
 
 #ifndef _SEARCHALGORITHMS_H
-#define _SEARCHALGORITHMS_H
+#define _SEARCHALGORITHMSClass_H
 
-#define RESOLUTION 1000
+#define RESOLUTION 100
 #define X_MIN 0 // mm
 #define X_MAX 1000 // mm
 #define Y_MIN -500 // mm
 #define Y_MAX 500 // mm
 
-class SearchAlgorithms {
+class SearchAlgorithmsClass {
 
     public:
 
@@ -20,7 +20,7 @@ class SearchAlgorithms {
         float y[RESOLUTION];
 
         // Constructor
-        SearchAlgorithms() {
+        SearchAlgorithmsClass() {
 
         }
 
@@ -55,8 +55,18 @@ class SearchAlgorithms {
         // Function to get the coordinates of a random search pattern
         void randomSearch() {
 
-            // How do we compare a random search pattern to one of the fixed patterns?
-            // Do we store the time taken or distance travelled to complete the fixed search patterns and enforce that time on the random search pattern and then compare the total waypoints found?
+            // Set the first point to 0,0
+            x[0] = 0;
+            y[0] = 0;
+
+            // Loop through the random resolution
+            for (int i = 1; i < RESOLUTION; i++) {
+
+                // Calculate the x and y coordinates
+                x[i] = random(X_MIN, X_MAX);
+                y[i] = random(Y_MIN, Y_MAX);
+
+            }
 
         }
 
