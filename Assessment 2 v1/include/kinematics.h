@@ -27,6 +27,7 @@ class Kinematics_c {
     float angle;
     float wheel_distance = 0.0878;
     float target_angle;
+    float theta_turn;
 
   
     // Constructor, must exist.
@@ -98,6 +99,8 @@ class Kinematics_c {
 
     void targetangle(float targetx, float targety){
         target_angle = atan2(targety - y, targetx - x);
+        theta_turn = atan2(targety - y, targetx - x) - theta;
+
         if (target_angle < -PI){
             target_angle += 2*PI;
         }
