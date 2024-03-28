@@ -80,18 +80,19 @@ void loop() {
   
   //  turn this into a line of code that finds the difference between x and xi and y and yi in kinematics run.update
   //  so that this can be an inequality and when this difference gets less than 0.1 or equivalent value
-  // if (kinematicsrun.x = waypointCoordinates.x[algorithminterval] && y = waypointCoordinates.y[algorithminterval]) 
-  // algorithminterval =+ 1;
-  // kinematicsrun.target_angle( waypointCoordinates.x[algorithminterval], waypointCoordinates.y[algorithminterval])
-  //   if (kinematicsrun.theta_turn < 0) {
-  //     setMotorpower(-20, 20)
-  //   }
-  //   if (kinematicsrun.theta_turn > 0) {
-  //     setMotorpower(20, -20)
-  //   }
-  //   if (abs(kinematicsrun.theta_turn) < 0.10) {
-  //     setMotorpower(0, 0)
-  //   }
+  if (kinematicsrun.x == searchAlgorithms.x[algorithminterval] && kinematicsrun.y == searchAlgorithms.y[algorithminterval]) {
+    algorithminterval =+ 1;
+    kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
+    // if (kinematicsrun.theta_turn < 0) {
+    //   setMotorpower(-20, 20)
+    // }
+    // if (kinematicsrun.theta_turn > 0) {
+    //   setMotorpower(20, -20)
+    // }
+    // if (abs(kinematicsrun.theta_turn) < 0.10) {
+    //   setMotorpower(0, 0)
+    // }
+  };
 
   //   //  enact drive forward pid control function
 
