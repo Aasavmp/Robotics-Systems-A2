@@ -50,6 +50,11 @@ void setup() {
   delay(2000);
 
   controltimestamp = millis();
+
+  // Get the coordinates of the search algorithms (amplitude, wavelength)
+  searchAlgorithms.sinSearch(100, 1000);
+  // searchAlgorithms.squareWaveSearch(100, 1000);
+  // searchAlgorithms.randomSearch();
   
 }
 
