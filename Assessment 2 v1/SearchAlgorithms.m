@@ -2,7 +2,7 @@ clear all
 clc
 
 %% Resoluion, Amplitude and Time period
-resolution = 1000;
+resolution = 100;
 amplitude = 100;
 wavelength = 50;
 
@@ -37,7 +37,7 @@ end
 
 % Plot values for the square wave
 figure
-plot(x, y)
+plot(x, y, 'o-')
 
 %% Get x and y values for random search
 x = (x_max-x_min)*rand(resolution, 1)+x_min;
