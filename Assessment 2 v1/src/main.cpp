@@ -24,6 +24,7 @@ unsigned long searchtimestamp;
 unsigned long pid_timestamp;
 unsigned long statemilliseconds;
 unsigned long elapsed_time;
+unsigned long turntimestamp;
 
 
 // defining required variables
@@ -205,6 +206,7 @@ void loop() {
     heading_feedback = heading_feedback_fast;
     pid_bias = 1;
   } else {
+    turntimestamp = millis();
     pid_bias = set_pid_bias;
   }
 
