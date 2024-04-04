@@ -48,7 +48,7 @@ float demand_heading = 0; /// Demand value
 int pid_bias = 5;
 int max_turnpwm = 100;
 
-
+float turnThreshold = 0.5;
 
 // Call the classes
 SearchAlgorithmsClass searchAlgorithms;
@@ -141,14 +141,14 @@ void loop() {
       // calculate the angle to turn to
     kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
     
-    if (kinematicsrun.theta_turn < 0) {
+    if (kinematicsrun.theta_turn < -turnThreshold) {
           setMotorPower(-20, 20);
     }
-    if (kinematicsrun.theta_turn > 0) {
+    if (kinematicsrun.theta_turn > turnThreshold) {
           setMotorPower(20, -20);
           
     }
-    if (abs(kinematicsrun.theta_turn) < 0.50) {
+    if (abs(kinematicsrun.theta_turn) < turnThreshold) {
         pidControllerheading.prev_time = millis();
         pidControllerleft.prev_time = millis();
         pidControllerright.prev_time = millis();
