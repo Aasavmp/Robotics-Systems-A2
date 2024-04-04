@@ -78,7 +78,7 @@ unsigned long lastWaypointTime = 0;
 
 // Define functions
 void storeWaypoints();
-void setMotorPower( float left_pwm, float right_pwm );
+
 
 void setup() {
   
@@ -97,8 +97,8 @@ void setup() {
   controltimestamp = millis();
 
   // Get the coordinates of the search algorithms (amplitude, wavelength)
-  searchAlgorithms.sinSearch(100, 1000);
-  // searchAlgorithms.squareWaveSearch(100, 1000);
+  // searchAlgorithms.sinSearch(100, 1000);
+  searchAlgorithms.squareWaveSearch(100, 50);
   // searchAlgorithms.randomSearch();
   
 }
@@ -134,44 +134,51 @@ void loop() {
   //  turn this into a line of code that finds the difference between x and xi and y and yi in kinematics run.update
   //  so that this can be an inequality and when this difference gets less than 0.1 or equivalent value
   if (kinematicsrun.x == searchAlgorithms.x[algorithminterval] && kinematicsrun.y == searchAlgorithms.y[algorithminterval]) {
-      algorithminterval =+ 1;
-      kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
       
-      if (kinematicsrun.theta_turn < 0) {
-            setMotorpower(-20, 20);
-      }
-      if (kinematicsrun.theta_turn > 0) {
-            setMotorpower(20, -20);
-      }
-      if (abs(kinematicsrun.theta_turn) < 0.10) {
-          pidControllerheading.prev_time = millis();
-          pidControllerleft.prev_time = millis();
-          pidControllerright.prev_time = millis();
-
-          heading_home_feedback += kinematicsrun.angle;
-        
-          
-          pidControllerheading.update(0 , heading_home_feedback);
-
-          float heading_feedback = pidControllerheading.getProportionalTerm();
-          // Serial.print(heading_feedback);
-          // Serial.print(",");
-
-          leftpwm = pid_bias - (heading_feedback);
-          rightpwm = pid_bias + (heading_feedback);
-
-
-          pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
-          pidControllerright.update(rightpwm, pidControllerright.lpf_r);
-
-        
-
-          setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
-
-   
-    }
-
+      //  find coordinates of next waypoint
+      algorithminterval =+ 1;
   }
+      // calculate the angle to turn to
+    kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
+    
+    if (kinematicsrun.theta_turn < 0) {
+          setMotorPower(-20, 20);
+    }
+    if (kinematicsrun.theta_turn > 0) {
+          setMotorPower(20, -20);
+          
+    }
+    if (abs(kinematicsrun.theta_turn) < 0.50) {
+        pidControllerheading.prev_time = millis();
+        pidControllerleft.prev_time = millis();
+        pidControllerright.prev_time = millis();
+
+        heading_home_feedback += kinematicsrun.angle;
+      
+        
+        pidControllerheading.update(0 , heading_home_feedback);
+
+        float heading_feedback = pidControllerheading.getProportionalTerm();
+        // Serial.print(heading_feedback);
+        // Serial.print(",");
+
+        leftpwm = pid_bias - (heading_feedback);
+        rightpwm = pid_bias + (heading_feedback);
+
+
+        pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
+        pidControllerright.update(rightpwm, pidControllerright.lpf_r);
+
+      
+
+        setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
+      
+
+  
+  }
+  storeWaypoints();
+
+  
 
 
 }
