@@ -99,6 +99,7 @@ class Kinematics_c {
 
     void targetangle(float targetx, float targety){
         target_angle = atan2(targety - y, targetx - x);
+        
         theta_turn = atan2(targety - y, targetx - x) - theta;
 
         if (target_angle < -PI){

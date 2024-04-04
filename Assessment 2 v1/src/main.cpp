@@ -98,7 +98,7 @@ void setup() {
 
   // Get the coordinates of the search algorithms (amplitude, wavelength)
   // searchAlgorithms.sinSearch(100, 1000);
-  searchAlgorithms.squareWaveSearch(100, 50);
+  searchAlgorithms.squareWaveSearch(0.1, 0.05);
   // searchAlgorithms.randomSearch();
   
 }
@@ -126,9 +126,25 @@ void loop() {
       pidControllerright.rotationalspeed(currentMillis);
   } 
 
+  Serial.print(algorithminterval);
+   Serial.print(",");
+  Serial.print(kinematicsrun.x);
+  Serial.print(",");
+  Serial.print(kinematicsrun.y);
+  Serial.print(",");
+  Serial.print(searchAlgorithms.x[algorithminterval]);
+  Serial.print(",");
+  Serial.print(searchAlgorithms.y[algorithminterval]);
+  Serial.print(",");  
+  Serial.print(kinematicsrun.target_angle);
+  Serial.print(",");
+  Serial.println(kinematicsrun.theta_turn);
+
+ 
 
 
 
+ 
   //  logic to check has robot arrived at next waypoint, if so count up find the next waypoint, calculate the angle to turn to and enact the turn
 
   //  turn this into a line of code that finds the difference between x and xi and y and yi in kinematics run.update
@@ -142,10 +158,10 @@ void loop() {
     kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
     
     if (kinematicsrun.theta_turn < -turnThreshold) {
-          setMotorPower(-20, 20);
+          setMotorPower(20, -20);
     }
     if (kinematicsrun.theta_turn > turnThreshold) {
-          setMotorPower(20, -20);
+          setMotorPower(-20, 20);
           
     }
     if (abs(kinematicsrun.theta_turn) < turnThreshold) {
@@ -172,7 +188,7 @@ void loop() {
       
 
         setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
-      
+      // setMotorPower(50,50);
 
   
   }
