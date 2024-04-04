@@ -3,14 +3,14 @@ clc
 
 %% Resoluion, Amplitude and Time period
 resolution = 1000;
-amplitude = 400;
-wavelength = 500;
+amplitude = 100;
+wavelength = 50;
 
 %% x and y boundaries
 x_min = 0;
-x_max = 1000;
-y_min = -500;
-y_max = 500;
+x_max = 300;
+y_min = -150;
+y_max = 150;
 
 %% Get x values
 x = x_min:(x_max-x_min)/resolution:x_max;
@@ -24,11 +24,14 @@ plot(x,y)
 
 %% Get y values for square wave
 y = [];
+y(end+1) = 0;
 for x_i = x
-    if mod(x_i, wavelength) < wavelength/2
-        y(end+1) = amplitude;
-    else
-        y(end+1) = -amplitude;
+    if x_i ~= 0
+        if mod(x_i, wavelength) < wavelength/2
+            y(end+1) = amplitude;
+        else
+            y(end+1) = -amplitude;
+        end
     end
 end
 
