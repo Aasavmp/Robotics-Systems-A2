@@ -6,10 +6,10 @@
 #define _SEARCHALGORITHMSClass_H
 
 #define RESOLUTION 100
-#define X_MIN 0 // mm
-#define X_MAX 0.3 // mm
-#define Y_MIN -0.15 // mm
-#define Y_MAX 0.15 // mm
+#define X_MIN 0 // m
+#define X_MAX 0.5 // m
+#define Y_MIN -0.15 // m
+#define Y_MAX 0.15 // m
 
 class SearchAlgorithmsClass {
 
@@ -46,7 +46,12 @@ class SearchAlgorithmsClass {
 
                 // Calculate the x and y coordinates
                 x[i] = X_MIN + i * (X_MAX - X_MIN) / RESOLUTION;
-                y[i] = amplitude * (fmod(x[i], wavelength) < wavelength / 2 ? 1 : -1); 
+
+                if (x[i] == 0) {
+                    y[i] = 0;
+                } else {
+                    y[i] = amplitude * (fmod(x[i], wavelength) < wavelength / 2 ? 1 : -1); 
+                }
 
             }
 

@@ -28,6 +28,9 @@ class Kinematics_c {
     float wheel_distance = 0.0878;
     float target_angle;
     float theta_turn;
+    float xdif;
+    float ydif;
+
 
   
     // Constructor, must exist.
@@ -46,7 +49,7 @@ class Kinematics_c {
 
     // Use this function to update
     // your kinematics
-    void update(int count_leftenc, int count_rightenc) {
+    void update(int count_leftenc, int count_rightenc, float xtarg, float ytarg) {
         // get the encoder values from the ISR function
 
 
@@ -82,13 +85,16 @@ class Kinematics_c {
         
 
 
-        if (theta > PI){
-            theta -= 2*PI;
-        }
-        else if (theta < -PI){
-            theta += 2*PI;
-        }
+        // if (theta > PI){
+        //     theta -= 2*PI;
+        // }
+        // else if (theta < -PI){
+        //     theta += 2*PI;
+        // }
         theta_degrees = theta * 180 / PI;
+
+        xdif = xtarg - x;
+        ydif = ytarg - y;
 
         // calculate a total distance travelled
 
@@ -102,12 +108,12 @@ class Kinematics_c {
         
         theta_turn = atan2(targety - y, targetx - x) - theta;
 
-        if (target_angle < -PI){
-            target_angle += 2*PI;
-        }
-        else if (target_angle > PI){
-            target_angle -= 2*PI;
-        }
+        // if (target_angle < -PI){
+        //     target_angle += 2*PI;
+        // }
+        // else if (target_angle > PI){
+        //     target_angle -= 2*PI;
+        // }
     }
 
     void angletohome(){

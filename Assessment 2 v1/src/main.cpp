@@ -34,6 +34,7 @@ float rightpwm;
 float speed_feedback_left;
 float speed_feedback_right;
 float feedback_heading;
+float feedback_heading_fast;
 
 // speed PID definifintions
 
@@ -41,14 +42,24 @@ const float Kpspeed = 8; // Adjust as needed
 const float demand_speed = 4; // Demand value
 const float Kispeed = 0.0001; // Integral gain
 
-const float kp_heading = 1; // Adjust as needed
-const float ki_heading = 0.0001; 
-float demand_heading = 0; /// Demand value
+const float kp_heading = 4; // Adjust as needed
+const float ki_heading = 2; 
 
-int pid_bias = 5;
+const float kp_heading_fast = 9; // Adjust as needed
+const float ki_heading_fast = 0.8; 
+
+int set_pid_bias = 5;
+int pid_bias = 0;
 int max_turnpwm = 100;
 
-float turnThreshold = 0.5;
+// Define the turn threshold
+float turnThresholdOne = 0.8;
+float turnThresholdTwo = 0.4;
+float turnThresholdThree = 0.05;
+float turnThresholdFour = 0.05;
+
+// Define the algorithm threshold for when the robot reaches its target algorithm point
+float algorithmThreshold = 0.01;
 
 // Call the classes
 SearchAlgorithmsClass searchAlgorithms;
@@ -57,6 +68,7 @@ Kinematics_c kinematicsrun;
 PIDController pidControllerleft(Kpspeed,Kispeed);
 PIDController pidControllerright(Kpspeed,Kispeed);
 PIDController pidControllerheading(kp_heading,ki_heading);
+PIDController pidControllerheading_fast(kp_heading_fast,ki_heading_fast);
 
 float heading_home_feedback = 0;
 
@@ -87,6 +99,8 @@ void setup() {
   kinematicsrun.initialise();
   pidControllerleft.initialize();
   pidControllerright.initialize();
+  pidControllerheading.initialize();
+  pidControllerheading_fast.initialize();
 
   // Start the serial monitor
   Serial.begin(9600);
@@ -97,10 +111,10 @@ void setup() {
   controltimestamp = millis();
 
   // Get the coordinates of the search algorithms (amplitude, wavelength)
-  // searchAlgorithms.sinSearch(100, 1000);
-  searchAlgorithms.squareWaveSearch(0.1, 0.05);
+  // searchAlgorithms.sinSearch(0.1, 0.1);
+  searchAlgorithms.squareWaveSearch(0.1, 0.2);
   // searchAlgorithms.randomSearch();
-  
+
 }
 
 void loop() {
@@ -112,7 +126,7 @@ void loop() {
   if (currentMillis - controltimestamp >= kinematics_time_interval) {
     controltimestamp = currentMillis;
     // Call the updateKinematics method of the Kinematics instance
-    kinematicsrun.update(count_leftenc, count_rightenc);
+    kinematicsrun.update(count_leftenc, count_rightenc, searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
     // x, y, theta_1, total_distance = updateKinematics();
   }
 
@@ -125,70 +139,95 @@ void loop() {
     pidControllerright.rotationalspeed(currentMillis);
   } 
 
-  Serial.print(algorithminterval);
-   Serial.print(",");
-  Serial.print(kinematicsrun.x);
-  Serial.print(",");
-  Serial.print(kinematicsrun.y);
-  Serial.print(",");
-  Serial.print(searchAlgorithms.x[algorithminterval]);
-  Serial.print(",");
-  Serial.print(searchAlgorithms.y[algorithminterval]);
-  Serial.print(",");  
-  Serial.print(kinematicsrun.target_angle);
-  Serial.print(",");
-  Serial.println(kinematicsrun.theta_turn);
+  // Serial.print(algorithminterval);
+  // Serial.print(",");
+  // Serial.print(kinematicsrun.x);
+  // Serial.print(",");
+  // Serial.print(kinematicsrun.y);
+  // Serial.print(",");
+  // Serial.print(searchAlgorithms.x[algorithminterval]);
+  // Serial.print(",");
+  // Serial.print(searchAlgorithms.y[algorithminterval]);
+  // Serial.print(","); 
+  // Serial.print(kinematicsrun.xdif);
+  // Serial.print(",");
+  // Serial.print(kinematicsrun.ydif);
+  // Serial.print(","); 
+  // Serial.print(kinematicsrun.target_angle);
+  // Serial.print(",");
+  // Serial.print(kinematicsrun.theta);
+  // Serial.print(",");
+  // Serial.print(kinematicsrun.target_angle - kinematicsrun.theta);
+  // Serial.print(",");
+  // Serial.println(kinematicsrun.theta_turn);
  
   //  logic to check has robot arrived at next waypoint, if so count up find the next waypoint, calculate the angle to turn to and enact the turn
   //  turn this into a line of code that finds the difference between x and xi and y and yi in kinematics run.update
   //  so that this can be an inequality and when this difference gets less than 0.1 or equivalent value
-  if (kinematicsrun.x == searchAlgorithms.x[algorithminterval] && kinematicsrun.y == searchAlgorithms.y[algorithminterval]) {
+  if (kinematicsrun.xdif < algorithmThreshold && kinematicsrun.xdif > -algorithmThreshold && kinematicsrun.ydif < algorithmThreshold && kinematicsrun.ydif > -algorithmThreshold) {
       
-    //  find coordinates of next waypoint
-    algorithminterval =+ 1;
+    // increment the algorithm interval
+    algorithminterval += 1;
+
+    // Reset the heading feedback integral term
+    pidControllerheading.integral = 0;
+    pidControllerheading_fast.integral = 0;
 
   }
 
   // calculate the angle to turn to
-  kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
-  
-  if (kinematicsrun.theta_turn < -turnThreshold) {
-        setMotorPower(20, -20);
-  }
-  if (kinematicsrun.theta_turn > turnThreshold) {
-        setMotorPower(-20, 20);
-        
-  }
-  if (abs(kinematicsrun.theta_turn) < turnThreshold) {
-    pidControllerheading.prev_time = millis();
-    pidControllerleft.prev_time = millis();
-    pidControllerright.prev_time = millis();
+  kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval] );
 
-    heading_home_feedback += kinematicsrun.angle;
-  
-    
-    pidControllerheading.update(0 , heading_home_feedback);
+  pidControllerheading.prev_time = millis();
+  pidControllerheading_fast.prev_time = millis();
+  pidControllerleft.prev_time = millis();
+  pidControllerright.prev_time = millis();
 
-    float heading_feedback = pidControllerheading.getProportionalTerm();
-    // Serial.print(heading_feedback);
-    // Serial.print(",");
+  pidControllerheading.update(kinematicsrun.target_angle, kinematicsrun.theta);
+  pidControllerheading_fast.update(kinematicsrun.target_angle, kinematicsrun.theta);
 
-    leftpwm = pid_bias - (heading_feedback);
-    rightpwm = pid_bias + (heading_feedback);
+  float heading_feedback = pidControllerheading.getProportionalTerm();
+  float heading_feedback_fast = pidControllerheading_fast.getProportionalTerm();
+  // Serial.print(heading_feedback);
+  // Serial.print(",");
 
-
-    pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
-    pidControllerright.update(rightpwm, pidControllerright.lpf_r);
-
-  
-
-    setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
-  // setMotorPower(50,50);
-
+  // if (abs(kinematicsrun.theta_turn) > turnThresholdFour) {
+  //   pid_bias = 5;
+  // }
+  // if (abs(kinematicsrun.theta_turn) > turnThresholdTwo) {
+  //   pid_bias = 3;
+  // } 
+  // if (abs(kinematicsrun.theta_turn) > turnThresholdTwo) {
+  //   pid_bias = 2;
+  //   heading_feedback = heading_feedback_fast;
+  // }
+  if (abs(kinematicsrun.theta_turn) > turnThresholdThree) {
+    heading_feedback = heading_feedback_fast;
+    pid_bias = 1;
+  } else {
+    pid_bias = set_pid_bias;
   }
 
-  // Sense and store waypoints
-  storeWaypoints();
+  leftpwm = pid_bias - (heading_feedback);
+  rightpwm = pid_bias + (heading_feedback);
+
+
+  pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
+  pidControllerright.update(rightpwm, pidControllerright.lpf_r);
+
+  setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
+
+  // Plot target angle and theta
+  Serial.print(kinematicsrun.target_angle);
+  Serial.print(",");
+  Serial.print(kinematicsrun.theta);
+  Serial.print(",");
+  Serial.print(leftpwm);
+  Serial.print(",");
+  Serial.println(rightpwm);
+
+// Sense and store waypoints
+storeWaypoints();
 
 }
 
