@@ -105,11 +105,10 @@ void setup() {
 
 void loop() {
 
+  // Get the current time
   unsigned long currentMillis = millis();
 
-
-
-      // Update kinematics every 20 ms
+  // Update kinematics every 20 ms
   if (currentMillis - controltimestamp >= kinematics_time_interval) {
     controltimestamp = currentMillis;
     // Call the updateKinematics method of the Kinematics instance
@@ -117,13 +116,13 @@ void loop() {
     // x, y, theta_1, total_distance = updateKinematics();
   }
 
-    // Update rotational speed every 10 ms
+  // Update rotational speed every 10 ms
   if (currentMillis - rotational_timestamp >= rotational_time_interval) {
-      rotational_timestamp = currentMillis;
+    rotational_timestamp = currentMillis;
 
-      // Call the rotationalspeed method of the PIDController instance
-      pidControllerleft.rotationalspeed(currentMillis);
-      pidControllerright.rotationalspeed(currentMillis);
+    // Call the rotationalspeed method of the PIDController instance
+    pidControllerleft.rotationalspeed(currentMillis);
+    pidControllerright.rotationalspeed(currentMillis);
   } 
 
   Serial.print(algorithminterval);
@@ -139,67 +138,59 @@ void loop() {
   Serial.print(kinematicsrun.target_angle);
   Serial.print(",");
   Serial.println(kinematicsrun.theta_turn);
-
- 
-
-
-
  
   //  logic to check has robot arrived at next waypoint, if so count up find the next waypoint, calculate the angle to turn to and enact the turn
-
   //  turn this into a line of code that finds the difference between x and xi and y and yi in kinematics run.update
   //  so that this can be an inequality and when this difference gets less than 0.1 or equivalent value
   if (kinematicsrun.x == searchAlgorithms.x[algorithminterval] && kinematicsrun.y == searchAlgorithms.y[algorithminterval]) {
       
-      //  find coordinates of next waypoint
-      algorithminterval =+ 1;
+    //  find coordinates of next waypoint
+    algorithminterval =+ 1;
+
   }
-      // calculate the angle to turn to
-    kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
-    
-    if (kinematicsrun.theta_turn < -turnThreshold) {
-          setMotorPower(20, -20);
-    }
-    if (kinematicsrun.theta_turn > turnThreshold) {
-          setMotorPower(-20, 20);
-          
-    }
-    if (abs(kinematicsrun.theta_turn) < turnThreshold) {
-        pidControllerheading.prev_time = millis();
-        pidControllerleft.prev_time = millis();
-        pidControllerright.prev_time = millis();
 
-        heading_home_feedback += kinematicsrun.angle;
-      
+  // calculate the angle to turn to
+  kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval]);
+  
+  if (kinematicsrun.theta_turn < -turnThreshold) {
+        setMotorPower(20, -20);
+  }
+  if (kinematicsrun.theta_turn > turnThreshold) {
+        setMotorPower(-20, 20);
         
-        pidControllerheading.update(0 , heading_home_feedback);
+  }
+  if (abs(kinematicsrun.theta_turn) < turnThreshold) {
+    pidControllerheading.prev_time = millis();
+    pidControllerleft.prev_time = millis();
+    pidControllerright.prev_time = millis();
 
-        float heading_feedback = pidControllerheading.getProportionalTerm();
-        // Serial.print(heading_feedback);
-        // Serial.print(",");
+    heading_home_feedback += kinematicsrun.angle;
+  
+    
+    pidControllerheading.update(0 , heading_home_feedback);
 
-        leftpwm = pid_bias - (heading_feedback);
-        rightpwm = pid_bias + (heading_feedback);
+    float heading_feedback = pidControllerheading.getProportionalTerm();
+    // Serial.print(heading_feedback);
+    // Serial.print(",");
+
+    leftpwm = pid_bias - (heading_feedback);
+    rightpwm = pid_bias + (heading_feedback);
 
 
-        pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
-        pidControllerright.update(rightpwm, pidControllerright.lpf_r);
-
-      
-
-        setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
-      // setMotorPower(50,50);
+    pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
+    pidControllerright.update(rightpwm, pidControllerright.lpf_r);
 
   
+
+    setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
+  // setMotorPower(50,50);
+
   }
+
+  // Sense and store waypoints
   storeWaypoints();
 
-  
-
-
 }
-
-  //   //  enact drive forward pid control functio
 
 // Function to store the sensed waypoints when the robot is in the search pattern
 void storeWaypoints() {
