@@ -7,9 +7,9 @@
 
 #define RESOLUTION 100
 #define X_MIN 0 // mm
-#define X_MAX 300 // mm
-#define Y_MIN -150 // mm
-#define Y_MAX 150 // mm
+#define X_MAX 0.3 // mm
+#define Y_MIN -0.15 // mm
+#define Y_MAX 0.15 // mm
 
 class SearchAlgorithmsClass {
 
