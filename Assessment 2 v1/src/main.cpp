@@ -55,7 +55,7 @@ const float kp_heading = 4; // Adjust as needed
 const float ki_heading = 2; 
 
 const float kp_heading_fast = 9; // Adjust as needed
-const float ki_heading_fast = 0.7; 
+const float ki_heading_fast = 0.65; 
 
 // Define the PID bias
 float pid_bias = 0;
