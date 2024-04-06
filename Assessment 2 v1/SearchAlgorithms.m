@@ -8,7 +8,7 @@ wavelength = 50;
 
 %% x and y boundaries
 x_min = 0;
-x_max = 300;
+x_max = 500;
 y_min = -150;
 y_max = 150;
 
