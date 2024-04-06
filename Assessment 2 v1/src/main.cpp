@@ -13,10 +13,11 @@
 // define timestamps
 #define kinematics_time_interval 20
 #define rotational_time_interval 10
-#define searchtimeint 1000
+#define searchtimeint 5000 // 1 minute search time
 #define PID_INTERVAL 100
+
 // Define the sensor dead time
-#define SENSOR_DEAD_TIME 1000
+#define SENSOR_DEAD_TIME 800
 
 unsigned long controltimestamp;
 unsigned long rotational_timestamp;
@@ -24,7 +25,7 @@ unsigned long searchtimestamp;
 unsigned long pid_timestamp;
 unsigned long statemilliseconds;
 unsigned long elapsed_time;
-unsigned long turntimestamp;
+unsigned long start_time;
 
 
 // defining required variables
@@ -88,7 +89,7 @@ unsigned long lastWaypointTime = 0;
 
 // Define functions
 void storeWaypoints();
-
+void searchState();
 
 void setup() {
   
@@ -107,6 +108,7 @@ void setup() {
   delay(2000);
 
   controltimestamp = millis();
+  start_time = millis();
 
   // Get the coordinates of the search algorithms (amplitude, wavelength)
   // searchAlgorithms.sinSearch(0.1, 0.2);
@@ -116,6 +118,36 @@ void setup() {
 }
 
 void loop() {
+
+  // If the robot hasn't found all the waypoints, run the entire search algorithm and run for a set time run the search state
+  if (numWaypointsFound < NUM_WAYPOINTS && millis()-start_time < searchtimeint && algorithminterval < RESOLUTION) {
+    
+    // Run the search state
+    searchState();
+
+  } else {
+
+    // Set the motors to stop
+    setMotorPower(0, 0);
+
+    Serial.println("Search complete");
+    // Print the sensed waypoints
+    for (int i = 0; i < NUM_WAYPOINTS; i++) {
+      Serial.print(numWaypointsFound);
+      Serial.print(",");
+      Serial.print(sensedWaypoints[i].x);
+      Serial.print(",");
+      Serial.println(sensedWaypoints[i].y);
+    }
+
+    delay(2000);
+
+  }
+  
+}
+
+// Function for the search state
+void searchState() {
 
   // Get the current time
   unsigned long currentMillis = millis();
@@ -176,17 +208,21 @@ void loop() {
   // calculate the angle to turn to
   kinematicsrun.targetangle( searchAlgorithms.x[algorithminterval], searchAlgorithms.y[algorithminterval] );
 
+  // Set the pid timestamp
   pidControllerheading.prev_time = millis();
   pidControllerheading_fast.prev_time = millis();
   pidControllerleft.prev_time = millis();
   pidControllerright.prev_time = millis();
 
+  // Update the PID heading controller
   pidControllerheading.update(kinematicsrun.target_angle, kinematicsrun.theta);
   pidControllerheading_fast.update(kinematicsrun.target_angle, kinematicsrun.theta);
 
+  // Get the heading feedback
   float heading_feedback = pidControllerheading.getProportionalTerm();
   float heading_feedback_fast = pidControllerheading_fast.getProportionalTerm();
 
+  // Set the heading PID and bias
   if (abs(kinematicsrun.theta_turn) > turnThresholdOne) {
     heading_feedback = heading_feedback_fast;
     pid_bias = 1;
@@ -197,26 +233,19 @@ void loop() {
     pid_bias = set_pid_bias;
   }
 
+  // Set the left and right PWM values
   leftpwm = pid_bias - (heading_feedback);
   rightpwm = pid_bias + (heading_feedback);
 
-
+  // Update the PID speed controller
   pidControllerleft.update(leftpwm, pidControllerleft.lpf_l);
   pidControllerright.update(rightpwm, pidControllerright.lpf_r);
 
+  // Set the motor power
   setMotorPower(pidControllerleft.p_term, pidControllerright.p_term);
 
-  // Plot target angle and theta
-  Serial.print(kinematicsrun.target_angle);
-  Serial.print(",");
-  Serial.print(kinematicsrun.theta);
-  Serial.print(",");
-  Serial.print(leftpwm);
-  Serial.print(",");
-  Serial.println(rightpwm);
-
-// Sense and store waypoints
-storeWaypoints();
+  // Sense and store waypoints
+  storeWaypoints();
 
 }
 
@@ -232,6 +261,9 @@ void storeWaypoints() {
     // Store the waypoint coordinates
     sensedWaypoints[numWaypointsFound].x = kinematicsrun.x;
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
+
+    // Increment the number of waypoints found
+    numWaypointsFound += 1;
 
   };
 
