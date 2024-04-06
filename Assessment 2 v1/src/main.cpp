@@ -13,11 +13,11 @@
 // define timestamps
 #define kinematics_time_interval 20
 #define rotational_time_interval 10
-#define searchtimeint 5000 // 1 minute search time
+#define searchtimeint 15000 // 1 minute search time
 #define PID_INTERVAL 100
 
 // Define the sensor dead time
-#define SENSOR_DEAD_TIME 800
+#define SENSOR_DEAD_TIME 1000
 
 unsigned long controltimestamp;
 unsigned long rotational_timestamp;
@@ -47,7 +47,7 @@ const float kp_heading = 4; // Adjust as needed
 const float ki_heading = 2; 
 
 const float kp_heading_fast = 9; // Adjust as needed
-const float ki_heading_fast = 0.8; 
+const float ki_heading_fast = 0.7; 
 
 float set_pid_bias = 5;
 float pid_bias = 0;
