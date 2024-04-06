@@ -38,7 +38,6 @@ float feedback_heading;
 float feedback_heading_fast;
 
 // speed PID definifintions
-
 const float Kpspeed = 8; // Adjust as needed
 const float demand_speed = 4; // Demand value
 const float Kispeed = 0.0001; // Integral gain
