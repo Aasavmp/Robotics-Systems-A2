@@ -49,15 +49,13 @@ const float ki_heading = 2;
 const float kp_heading_fast = 9; // Adjust as needed
 const float ki_heading_fast = 0.8; 
 
-int set_pid_bias = 5;
-int pid_bias = 0;
+float set_pid_bias = 5;
+float pid_bias = 0;
 int max_turnpwm = 100;
 
 // Define the turn threshold
-float turnThresholdOne = 0.8;
-float turnThresholdTwo = 0.4;
-float turnThresholdThree = 0.05;
-float turnThresholdFour = 0.05;
+float turnThresholdOne = 0.2;
+float turnThresholdTwo = 0.1;
 
 // Define the algorithm threshold for when the robot reaches its target algorithm point
 float algorithmThreshold = 0.01;
@@ -112,7 +110,7 @@ void setup() {
   controltimestamp = millis();
 
   // Get the coordinates of the search algorithms (amplitude, wavelength)
-  // searchAlgorithms.sinSearch(0.1, 0.1);
+  // searchAlgorithms.sinSearch(0.1, 0.2);
   searchAlgorithms.squareWaveSearch(0.1, 0.2);
   // searchAlgorithms.randomSearch();
 
@@ -189,24 +187,14 @@ void loop() {
 
   float heading_feedback = pidControllerheading.getProportionalTerm();
   float heading_feedback_fast = pidControllerheading_fast.getProportionalTerm();
-  // Serial.print(heading_feedback);
-  // Serial.print(",");
 
-  // if (abs(kinematicsrun.theta_turn) > turnThresholdFour) {
-  //   pid_bias = 5;
-  // }
-  // if (abs(kinematicsrun.theta_turn) > turnThresholdTwo) {
-  //   pid_bias = 3;
-  // } 
-  // if (abs(kinematicsrun.theta_turn) > turnThresholdTwo) {
-  //   pid_bias = 2;
-  //   heading_feedback = heading_feedback_fast;
-  // }
-  if (abs(kinematicsrun.theta_turn) > turnThresholdThree) {
+  if (abs(kinematicsrun.theta_turn) > turnThresholdOne) {
     heading_feedback = heading_feedback_fast;
     pid_bias = 1;
+  } else if (abs(kinematicsrun.theta_turn) > turnThresholdTwo) {
+    heading_feedback = heading_feedback_fast;
+    pid_bias = set_pid_bias;
   } else {
-    turntimestamp = millis();
     pid_bias = set_pid_bias;
   }
 

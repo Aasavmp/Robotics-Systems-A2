@@ -5,7 +5,7 @@
 #ifndef _SEARCHALGORITHMS_H
 #define _SEARCHALGORITHMSClass_H
 
-#define RESOLUTION 100
+#define RESOLUTION 200
 #define X_MIN 0 // m
 #define X_MAX 0.5 // m
 #define Y_MIN -0.15 // m
