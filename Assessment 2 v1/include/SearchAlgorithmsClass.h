@@ -6,7 +6,7 @@
 #define _SEARCHALGORITHMSClass_H
 
 #define RESOLUTION 200
-#define X_MIN 0 // m
+#define X_MIN 0.001 // m
 #define X_MAX 0.5 // m
 #define Y_MIN -0.15 // m
 #define Y_MAX 0.15 // m
@@ -21,6 +21,20 @@ class SearchAlgorithmsClass {
 
         // Constructor
         SearchAlgorithmsClass() {
+
+        }
+
+        // Initialise the search algorithms
+        void init(int searchAlgorithm, float amplitude, float wavelength) {
+
+            // Get the coordinates of the search algorithms (amplitude, wavelength)
+            if (searchAlgorithm == 1) {
+                sinSearch(amplitude, wavelength);
+            } else if (searchAlgorithm == 2) {
+                squareWaveSearch(amplitude, wavelength);
+            } else if (searchAlgorithm == 3) {
+                randomSearch();
+            }
 
         }
 
