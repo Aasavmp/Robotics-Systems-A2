@@ -106,6 +106,7 @@ unsigned long lastWaypointTime_5 = 0;
 // Define functions
 void storeWaypoints();
 void searchState();
+void Buzzer(int toggle_duration);
 
 void setup() {
   
