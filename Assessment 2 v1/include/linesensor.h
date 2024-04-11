@@ -21,12 +21,12 @@
 #define LS_MIDRIGHT_INDEX 3
 #define LS_RIGHT_INDEX 4
 
-int threshold = 800;
+int threshold = 1200;
 // define black and white thresholds for each sensor
 #define LS_LEFT_THRESHOLD threshold
 #define LS_MIDLEFT_THRESHOLD threshold
 #define LS_MIDDLE_THRESHOLD threshold
-#define LS_MIDRIGHT_THRESHOLD   threshold
+#define LS_MIDRIGHT_THRESHOLD threshold
 #define LS_RIGHT_THRESHOLD threshold
 
 // Start class definition
@@ -179,7 +179,6 @@ class LineSensorClass {
                     line_detected[i] = false;
                 }
             }
-            Serial.println(parallel_reading_all[1]);
 
         }
 
