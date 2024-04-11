@@ -294,6 +294,15 @@ void storeWaypoints() {
     Buzzer(100);
   }
 
+  // If the robots stored waypoints are within 0.01m of each other, remove the last waypoint
+  if (numWaypointsFound > 1) {
+    for (int i = 0; i < numWaypointsFound-1; i++) {
+      if (abs(sensedWaypoints[numWaypointsFound-1].x - sensedWaypoints[i].x) < 0.01 && abs(sensedWaypoints[numWaypointsFound-1].y - sensedWaypoints[i].y) < 0.01) {
+        numWaypointsFound -= 1;
+      }
+    }
+  }
+
 
 }
 
