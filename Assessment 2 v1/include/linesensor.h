@@ -39,6 +39,9 @@ class LineSensorClass {
         float parallel_reading_all[MAX_SENSORS];
         float parallel_reading_center[MAX_CENTER_SENSORS];
 
+        // Store the bool for line detected
+        bool line_detected[MAX_SENSORS];
+
         // Create an array to store the line sensor thresholds
         int ls_thresholds_all[MAX_SENSORS] = {LS_LEFT_THRESHOLD, LS_MIDLEFT_THRESHOLD, LS_MIDDLE_THRESHOLD, LS_MIDRIGHT_THRESHOLD, LS_RIGHT_THRESHOLD};
         int ls_thresholds_center[MAX_CENTER_SENSORS] = {LS_MIDLEFT_THRESHOLD, LS_MIDDLE_THRESHOLD, LS_MIDRIGHT_THRESHOLD};
@@ -156,21 +159,20 @@ class LineSensorClass {
             
         }
 
-        // Function to determine if a line has been detected
-        bool LineDetected() {
+        // Function to detect which line sensors have detected a line
+        void LineDetectedSensors() {
 
             // Start the line sensors
             ParallelLineSensorRead();
 
-            // Run through the central line sensors and check if they are on black
-            for (int i = 0; i < MAX_CENTER_SENSORS; i++) {
-                if (parallel_reading_center[i] > ls_thresholds_center[i]) {
-                return true;
+            // Run through all the line sensors and check if they are on black
+            for (int i = 0; i < MAX_SENSORS; i++) {
+                if (parallel_reading_all[i] > ls_thresholds_all[i]) {
+                    line_detected[i] = true;
+                } else {
+                    line_detected[i] = false;
                 }
             }
-
-            // If no line is detected then return false
-            return false;
 
         }
 

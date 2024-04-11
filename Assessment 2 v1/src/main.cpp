@@ -92,8 +92,13 @@ struct waypointCoordinates {
 // Array to store the sensed waypoints
 waypointCoordinates sensedWaypoints[NUM_WAYPOINTS];
 
-// Store the last time the waypoint was sensed
-unsigned long lastWaypointTime = 0;
+// Store the last time the waypoint was sensed by each sensor
+unsigned long lastWaypointTime_1 = 0;
+unsigned long lastWaypointTime_2 = 0;
+unsigned long lastWaypointTime_3 = 0;
+unsigned long lastWaypointTime_4 = 0;
+unsigned long lastWaypointTime_5 = 0;
+
 
 // Define functions
 void storeWaypoints();
@@ -240,19 +245,35 @@ void searchState() {
 // Function to store the sensed waypoints when the robot is in the search pattern
 void storeWaypoints() {
 
-  // if statement to store data if the line sensor detects a waypoint
-  if (lineSensor.LineDetected() && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime > SENSOR_DEAD_TIME) {
+  // Call the line sensor method to check all the sensors
+  lineSensor.LineDetectedSensors();
 
-    // Store the time the waypoint was sensed
-    lastWaypointTime = millis();
-
-    // Store the waypoint coordinates
-    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x;
-    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
-
-    // Increment the number of waypoints found
+  // If statements for each sensor to store the time the waypoint was sensed
+  if (lineSensor.line_detected[0] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_1 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.0285;
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + 0.03;
     numWaypointsFound += 1;
-
-  };
+  } else if (lineSensor.line_detected[1] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_2 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_2 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.041;
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + 0.01;
+    numWaypointsFound += 1;
+  } else if (lineSensor.line_detected[2] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_3 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_3 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x - 0.043;
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
+    numWaypointsFound += 1;
+  } else if (lineSensor.line_detected[3] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_4 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_4 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.041;
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y - 0.01;
+    numWaypointsFound += 1;
+  } else if (lineSensor.line_detected[4] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_5 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_5 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.0285;
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y - 0.03;
+    numWaypointsFound += 1;
+  }
 
 }
