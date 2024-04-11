@@ -12,11 +12,11 @@
 // define timestamps
 #define kinematics_time_interval 20
 #define rotational_time_interval 10
-#define searchtimeint 15000 // 1 minute search time
+#define searchtimeint 30000 // 1 minute search time
 #define PID_INTERVAL 100
 
 // Define the sensor dead time
-#define SENSOR_DEAD_TIME 1000
+#define SENSOR_DEAD_TIME 2000
 
 // Independent variables to change
 float set_pid_bias = 5;

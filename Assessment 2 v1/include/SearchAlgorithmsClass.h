@@ -7,9 +7,9 @@
 
 #define RESOLUTION 200
 #define X_MIN 0 // m
-#define X_MAX 0.5 // m
-#define Y_MIN -0.15 // m
-#define Y_MAX 0.15 // m
+#define X_MAX 0.42 // m
+#define Y_MIN -0.149 // m
+#define Y_MAX 0.149 // m
 
 class SearchAlgorithmsClass {
 
