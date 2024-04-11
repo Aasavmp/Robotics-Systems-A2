@@ -18,7 +18,7 @@
 // Define the sensor dead time
 #define SENSOR_DEAD_TIME 1000
 
-// Buzzer pin
+// Define buzz pin
 #define BUZZER_PIN 6
 
 // Independent variables to change
@@ -120,7 +120,8 @@ void setup() {
   // Initialise the search algorithms
   searchAlgorithms.init(search_algorithm, search_amplitude, search_wavelength);
 
-  // Set buzzer pin
+  // Set LED pin and buzzer pin
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
 
   // Start the serial monitor
@@ -261,35 +262,50 @@ void storeWaypoints() {
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + 0.03;
     numWaypointsFound += 1;
     // Turn the buzzer on
-    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+    Buzzer(100);
   } else if (lineSensor.line_detected[1] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
     lastWaypointTime_1 = millis();
     sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.041;
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + 0.01;
     numWaypointsFound += 1;
     // Turn the buzzer on
-    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+    Buzzer(100);
   } else if (lineSensor.line_detected[2] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
     lastWaypointTime_1 = millis();
     sensedWaypoints[numWaypointsFound].x = kinematicsrun.x - 0.043;
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
     numWaypointsFound += 1;
     // Turn the buzzer on
-    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+    Buzzer(100);
   } else if (lineSensor.line_detected[3] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
     lastWaypointTime_1 = millis();
     sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.041;
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y - 0.01;
     numWaypointsFound += 1;
     // Turn the buzzer on
-    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+    Buzzer(100);
   } else if (lineSensor.line_detected[4] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
     lastWaypointTime_1 = millis();
     sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.0285;
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y - 0.03;
     numWaypointsFound += 1;
     // Turn the buzzer on
-    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+    Buzzer(100);
   }
 
+  digitalWrite(LED_BUILTIN, LOW);
+
+}
+
+// Function to turn the buzzer on and off
+void Buzzer(int toggle_duration) {
+  digitalWrite( BUZZER_PIN, LOW );
+  delayMicroseconds(toggle_duration);
+  digitalWrite( BUZZER_PIN, HIGH );
+  delayMicroseconds(toggle_duration);
 }
