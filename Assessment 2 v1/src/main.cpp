@@ -259,36 +259,36 @@ void storeWaypoints() {
   // If statements for each sensor to store the time the waypoint was sensed
   if (lineSensor.line_detected[0] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
     lastWaypointTime_1 = millis();
-    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.0285*cos(kinematicsrun.theta);
-    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + 0.03*sin(kinematicsrun.theta);
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + (sqrt(0.0285*0.0285 + 0.03*0.03))*cos(kinematicsrun.theta+atan(0.03/0.0285));
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + (sqrt(0.0285*0.0285 + 0.03*0.03))*sin(kinematicsrun.theta+atan(0.03/0.0285));
     numWaypointsFound += 1;
     // Turn the buzzer on
     Buzzer(100);
-  } else if (lineSensor.line_detected[1] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
-    lastWaypointTime_1 = millis();
-    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.041*cos(kinematicsrun.theta);
-    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + 0.01*sin(kinematicsrun.theta);
+  } else if (lineSensor.line_detected[1] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_2 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_2 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + (sqrt(0.041*0.041 + 0.01*0.01))*cos(kinematicsrun.theta+atan(0.01/0.041));
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + (sqrt(0.041*0.041 + 0.01*0.01))*sin(kinematicsrun.theta+atan(0.01/0.041));
     numWaypointsFound += 1;
     // Turn the buzzer on
     Buzzer(100);
-  } else if (lineSensor.line_detected[2] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
-    lastWaypointTime_1 = millis();
+  } else if (lineSensor.line_detected[2] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_3 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_3 = millis();
     sensedWaypoints[numWaypointsFound].x = kinematicsrun.x - 0.043*cos(kinematicsrun.theta);
     sensedWaypoints[numWaypointsFound].y = kinematicsrun.y;
     numWaypointsFound += 1;
     // Turn the buzzer on
     Buzzer(100);
-  } else if (lineSensor.line_detected[3] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
-    lastWaypointTime_1 = millis();
-    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.041*cos(kinematicsrun.theta);
-    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y - 0.01+sin(kinematicsrun.theta);
+  } else if (lineSensor.line_detected[3] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_4 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_4 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + (sqrt(0.041*0.041 + 0.01*0.01))*cos(kinematicsrun.theta-atan(0.01/0.041));
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + (sqrt(0.041*0.041 + 0.01*0.01))*sin(kinematicsrun.theta-atan(0.01/0.041));
     numWaypointsFound += 1;
     // Turn the buzzer on
     Buzzer(100);
-  } else if (lineSensor.line_detected[4] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_1 > SENSOR_DEAD_TIME) {
-    lastWaypointTime_1 = millis();
-    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + 0.0285*cos(kinematicsrun.theta);
-    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y - 0.03*sin(kinematicsrun.theta);
+  } else if (lineSensor.line_detected[4] && numWaypointsFound < NUM_WAYPOINTS && millis() - lastWaypointTime_5 > SENSOR_DEAD_TIME) {
+    lastWaypointTime_5 = millis();
+    sensedWaypoints[numWaypointsFound].x = kinematicsrun.x + (sqrt(0.0285*0.0285 + 0.03*0.03))*cos(kinematicsrun.theta-atan(0.03/0.0285));
+    sensedWaypoints[numWaypointsFound].y = kinematicsrun.y + (sqrt(0.0285*0.0285 + 0.03*0.03))*sin(kinematicsrun.theta-atan(0.03/0.0285));
     numWaypointsFound += 1;
     // Turn the buzzer on
     Buzzer(100);
