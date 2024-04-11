@@ -162,6 +162,11 @@ class LineSensorClass {
         // Function to detect which line sensors have detected a line
         void LineDetectedSensors() {
 
+            // Set the line detected array to false
+            for (int i = 0; i < MAX_SENSORS; i++) {
+                line_detected[i] = false;
+            }
+
             // Start the line sensors
             ParallelLineSensorRead();
 
