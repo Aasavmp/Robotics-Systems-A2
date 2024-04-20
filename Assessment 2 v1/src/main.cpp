@@ -7,12 +7,12 @@
 #include "Motors.h"
 
 // Define number of waypoints
-#define NUM_WAYPOINTS 10
+#define NUM_WAYPOINTS 15
 
 // define timestamps
 #define kinematics_time_interval 20
 #define rotational_time_interval 10
-#define searchtimeint 30000 // 1 minute search time
+#define searchtimeint 300000 // 1 minute search time
 #define PID_INTERVAL 100
 
 // Define the sensor dead time
@@ -26,7 +26,7 @@ float set_pid_bias = 5; // 5, 7.5, 10
 float turn_power_factor = 1; // 1, 1.5, 2
 float search_amplitude = 0.1; // 0.05, 0.1, 0.15
 float search_wavelength = 0.4; // 0.1, 0.2, 0.4
-int search_algorithm = 3; // 1 = sin, 2 = square, 3 = random
+int search_algorithm = 2; // 1 = sin, 2 = square, 3 = random
 
 // Define time stamps
 unsigned long controltimestamp;
@@ -158,8 +158,6 @@ void loop() {
 
     // Print the sensed waypoints
     for (int i = 0; i < NUM_WAYPOINTS; i++) {
-      Serial.print(numWaypointsFound);
-      Serial.print(",");
       Serial.print(sensedWaypoints[i].x);
       Serial.print(",");
       Serial.println(sensedWaypoints[i].y);
