@@ -60,6 +60,8 @@
 import pandas as pd
 import re
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Load the Excel file into a DataFrame
 df = pd.read_excel('Results Waypoint 2.xlsx')
@@ -124,22 +126,47 @@ def process_experiment_runs(df):
 # Function to process the experiment runs and compare the distance to waypoints
 def calculate_processed_data(df, waypoints):
     # Dictionary to store the processedhfd data
+    waypoints_found = {}
     waypoints_distance_data = {}
     waypoints_number_found_data = {}
     run_accuracy_data = {}
+    run_accuracy_data_firstpoint = {}
+    run_accuracy_data_lastpoint = {}
     time_data = {}
     time_per_waypoint_data = {}
+
+    waypoints_distance_data_x = {}
+    waypoints_distance_data_y = {}
+    run_accuracy_data_x = {}
+    run_accuracy_data_y = {}
+    run_accuracy_data_x_firstpoint = {}
+    run_accuracy_data_y_firstpoint = {}
+    run_accuracy_data_x_lastpoint = {}
+    run_accuracy_data_y_lastpoint = {}
 
     # Get the experimental data
     experiment_data = process_experiment_runs(df)
     # Loop through the experiment data
     for key, value in experiment_data.items():
         # Store the distance to waypoints for each run in the experiment
+        waypoints_found[key] = {}
         waypoints_distance_data[key] = {}
         waypoints_number_found_data[key] = []
         time_data[key] = []
         run_accuracy_data[key] = []
+        run_accuracy_data_firstpoint[key] = []
+        run_accuracy_data_lastpoint[key] = []
         time_per_waypoint_data[key] = []
+
+        waypoints_distance_data_x[key] = {}
+        waypoints_distance_data_y[key] = {}
+
+        run_accuracy_data_x[key] = []
+        run_accuracy_data_y[key] = []
+        run_accuracy_data_x_firstpoint[key] = []
+        run_accuracy_data_y_firstpoint[key] = []
+        run_accuracy_data_x_lastpoint[key] = []
+        run_accuracy_data_y_lastpoint[key] = []
 
         # Start run index
         run_index = 1
@@ -149,20 +176,45 @@ def calculate_processed_data(df, waypoints):
 
             # If the run_key is the same as the name of the filtered runs store those waypoints
             if run_key == f'run{run_index}':
+                waypoints_found[key][run_key] = run_values
                 waypoints_distance_data[key][run_key] = []
+
+                waypoints_distance_data_x[key][run_key] = []
+                waypoints_distance_data_y[key][run_key] = []
                 # Loop through the run values and calculate the distance to waypoints
                 for xy in run_values:
                     for wp in waypoints:
                         dist = distance(xy, wp)
                         if dist <= 0.025:
+                            # Store the distance to waypoints
                             waypoints_distance_data[key][run_key].append(dist)
+
+                            # Store the x and y distances to waypoints
+                            waypoints_distance_data_x[key][run_key].append(abs(xy[0] - wp[0]))
+                            waypoints_distance_data_y[key][run_key].append(abs(xy[1] - wp[1]))
 
                 # Store the number of waypoints found
                 waypoints_number_found_data[key].append(len(waypoints_distance_data[key][run_key]))
 
+                # Store the distance to the first and last waypoints
+                run_accuracy_data_firstpoint[key].append(waypoints_distance_data[key][run_key][0])
+                run_accuracy_data_lastpoint[key].append(waypoints_distance_data[key][run_key][-1])
+
                 # Calculate the average distance to waypoints
-                average_distance = sum(waypoints_distance_data[key][run_key]) / len(waypoints_distance_data[key][run_key])
+                average_distance = np.mean(waypoints_distance_data[key][run_key])
                 run_accuracy_data[key].append(average_distance)
+
+                # Calculate the average x and y distance to waypoints
+                run_accuracy_data_x[key].append(np.mean(waypoints_distance_data_x[key][run_key]))
+                run_accuracy_data_y[key].append(np.mean(waypoints_distance_data_y[key][run_key]))
+
+                # Calculate the average x and y distance to first waypoint
+                run_accuracy_data_x_firstpoint[key].append(waypoints_distance_data_x[key][run_key][0])
+                run_accuracy_data_y_firstpoint[key].append(waypoints_distance_data_y[key][run_key][0])
+
+                # Calculate the average x and y distance to last waypoint
+                run_accuracy_data_x_lastpoint[key].append(waypoints_distance_data_x[key][run_key][-1])
+                run_accuracy_data_y_lastpoint[key].append(waypoints_distance_data_y[key][run_key][-1])
                         
             # If the run_key is the same as the name of the time values store those time values
             if run_key == f'run{run_index}_time_values':
@@ -176,14 +228,47 @@ def calculate_processed_data(df, waypoints):
 
         
     # return all the data
-    return waypoints_distance_data, waypoints_number_found_data, run_accuracy_data, time_data, time_per_waypoint_data
+    return waypoints_found, waypoints_distance_data, waypoints_number_found_data, run_accuracy_data, run_accuracy_data_firstpoint, run_accuracy_data_lastpoint, time_data, time_per_waypoint_data, run_accuracy_data_x, run_accuracy_data_y, waypoints_distance_data_x, waypoints_distance_data_y, run_accuracy_data_x_firstpoint, run_accuracy_data_y_firstpoint, run_accuracy_data_x_lastpoint, run_accuracy_data_y_lastpoint
 
-# Apply the function to process experiment runs
-experiment_data = process_experiment_runs(df)
+# Function to box plot the data
+def box_plot_data(data, title, x_label, y_label):
+    max_length = max(len(lst) for lst in data.values())
+    for key, lst in data.items():
+        if len(lst) < max_length:
+            data[key] = lst + [np.nan] * (max_length - len(lst))
+    # Create a DataFrame from the data
+    df = pd.DataFrame(data)
+    # Create a box plot
+    ax = df.boxplot(rot=0)
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    # Display the plot
+    plt.show()
 
-waypoints_distance_data, waypoints_number_found_data, run_accuracy_data, time_data, time_per_waypoint_data = calculate_processed_data(df, waypoints)
+waypoints_found, waypoints_distance_data, waypoints_number_found_data, run_accuracy_data, run_accuracy_data_firstpoint, run_accuracy_data_lastpoint, time_data,time_per_waypoint_data, run_accuracy_data_x, run_accuracy_data_y, waypoints_distance_data_x, waypoints_distance_data_y, run_accuracy_data_x_firstpoint, run_accuracy_data_y_firstpoint, run_accuracy_data_x_lastpoint, run_accuracy_data_y_lastpoint = calculate_processed_data(df, waypoints)
 
-print(experiment_data)
+# box_plot_data(waypoints_number_found_data, 'Number of Waypoints Found', 'Experiment', 'Number of Waypoints Found')
+# box_plot_data(run_accuracy_data, 'Average Distance to Waypoints', 'Experiment', 'Average Distance to Waypoints')
+# box_plot_data(time_data, 'Time to Complete Experiment', 'Experiment', 'Time (s)')
+# box_plot_data(time_per_waypoint_data, 'Time per Waypoint', 'Experiment', 'Time per Waypoint (s)')
+# box_plot_data(run_accuracy_data_firstpoint, 'Distance to First Waypoint', 'Experiment', 'Distance to First Waypoint')
+# box_plot_data(run_accuracy_data_lastpoint, 'Distance to Last Waypoint', 'Experiment', 'Distance to Last Waypoint')
+# box_plot_data(run_accuracy_data_x, 'Average X Distance to Waypoints', 'Experiment', 'Average X Distance to Waypoints')
+# box_plot_data(run_accuracy_data_y, 'Average Y Distance to Waypoints', 'Experiment', 'Average Y Distance to Waypoints')
+box_plot_data(run_accuracy_data_x_firstpoint, 'X Distance to First Waypoint', 'Experiment', 'X Distance to First Waypoint')
+box_plot_data(run_accuracy_data_y_firstpoint, 'Y Distance to First Waypoint', 'Experiment', 'Y Distance to First Waypoint')
+box_plot_data(run_accuracy_data_x_lastpoint, 'X Distance to Last Waypoint', 'Experiment', 'X Distance to Last Waypoint')
+box_plot_data(run_accuracy_data_y_lastpoint, 'Y Distance to Last Waypoint', 'Experiment', 'Y Distance to Last Waypoint')
+
+# Plot the average distance to waypoints of each run
+# for key, value in waypoints_number_found_data.items():
+#     plt.plot(value, label=key)
+# plt.legend(title='Experiment')
+# plt.title('Average Distance to Waypoints')
+# plt.xlabel('Run')
+# plt.ylabel('Average Distance to Waypoints')
+# plt.show()
 
 # Output the processed data for verification
 # print(experiment_data)
