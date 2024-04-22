@@ -4,13 +4,13 @@ clc
 %% Resoluion, Amplitude and Time period
 resolution = 1000;
 amplitude = 100;
-wavelength = 200;
+wavelength = 400;
 
 %% x and y boundaries
 x_min = 0;
-x_max = 500;
-y_min = -150;
-y_max = 150;
+x_max = 420;
+y_min = -297/2;
+y_max = 297/2;
 
 %% Get x values
 x = x_min:(x_max-x_min)/resolution:x_max;
@@ -21,6 +21,9 @@ y = amplitude * sin(x*((2*pi)/wavelength));
 % Plot x vs y for sinusoidal
 figure
 plot(x,y)
+
+% Fix the axis limits
+axis([x_min x_max y_min y_max])
 hold on
 
 %% Get y values for square wave
@@ -38,6 +41,10 @@ end
 
 % Plot values for the square wave
 plot(x, y)
+
+% Show the legend
+legend('Sinusoidal', 'Square Wave')
+title('Wavelength = 0.4')
 
 %% Get x and y values for random search
 x = (x_max-x_min)*rand(resolution, 1)+x_min;
