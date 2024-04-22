@@ -22,8 +22,8 @@
 #define BUZZER_PIN 6
 
 // Independent variables to change
-float set_pid_bias = 5; // 5, 7.5, 10
-float turn_power_factor = 1; // 1, 1.5, 2
+float set_pid_bias = 7.5; // 5, 7.5, 10
+float turn_power_factor = 1.5; // 1, 1.5, 2
 float search_amplitude = 0.1; // 0.05, 0.1, 0.15
 float search_wavelength = 0.2; // 0.1, 0.2, 0.4
 int search_algorithm = 1; // 1 = sin, 2 = square, 3 = random
