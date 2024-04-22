@@ -1,60 +1,3 @@
-# import pandas as pd
-# import re
-# import math
-
-# # Load the Excel file into a DataFrame
-# df = pd.read_excel('Results Waypoint 2.xlsx')
-
-# # Extract the first 10 waypoints from the first two columns
-# waypoints = df.iloc[:10, :2].values
-
-# # Store these waypoints in a variable
-# waypoints_variable = waypoints
-
-# # Function to parse the header and create a dictionary
-# def extract_parameters_from_header(text):
-#     searchtype = text.split()[0]
-#     speed = re.search(r'Speed (\d+)', text)
-#     amplitude = re.search(r'A(\d+\.\d+)', text)
-#     wavelength = re.search(r'W(\d+\.\d+)', text)
-#     return {
-#         'searchtype': searchtype,
-#         'speed': int(speed.group(1)) if speed else None,
-#         'amplitude': float(amplitude.group(1)) if amplitude else None,
-#         'wavelength': float(wavelength.group(1)) if wavelength else None
-#     }
-
-
-
-
-
-# # Function to process the experiment runs from the 3rd column onwards
-# def process_experiment_runs(df):
-#     experiments = {}
-#     col = 2  # Start from the third column (index 2)
-#     while col < len(df.columns):
-#         header_text = str(df.columns[col])
-#         # Only process if header is not purely numeric and not blank, and check if the column itself is not blank
-#         if not header_text.replace('.', '', 1).isdigit() and header_text.strip() and pd.notna(df.iloc[0, col]):
-#             param_dict = extract_parameters_from_header(header_text)
-#             dict_key = f"{param_dict['searchtype']}_{param_dict['speed']}_{param_dict['amplitude']}_{param_dict['wavelength']}"
-#             experiments[dict_key] = {}
-#             run_index = 1
-#             next_col = col  # Start from the current header column
-#             while next_col < len(df.columns) and pd.notna(df.iloc[0, next_col]):
-#                 run_key = f"run{run_index}"
-#                 xy_values = df.iloc[1:11, next_col].dropna().tolist()  # Assume the next 10 rows contain the data
-#                 experiments[dict_key][run_key] = xy_values
-#                 run_index += 1
-#                 next_col += 1
-#             col = next_col  # Move the outer loop's index to the column after the last non-blank column
-#         else:
-#             col += 1
-#     return experiments
-
-# # Apply the function to process experiment runs
-# experiment_data = process_experiment_runs(df)
-
 # # Output the processed data for verification
 # print(experiment_data)
 import pandas as pd
@@ -65,6 +8,7 @@ import matplotlib.pyplot as plt
 
 # Load the Excel file into a DataFrame
 df = pd.read_excel('Results Waypoint 2.xlsx')
+# df = pd.read_excel('Results Waypoint 1.xlsx')
 
 # Extract the first 10 waypoints from the first two columns and convert to list of tuples
 waypoints = [tuple(map(float, x)) for x in df.iloc[:10, :2].values]
@@ -243,23 +187,25 @@ def box_plot_data(data, title, x_label, y_label):
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
+    # Fix the y axis to start from 0
+    ax.set_ylim(bottom=0)
     # Display the plot
     plt.show()
 
 waypoints_found, waypoints_distance_data, waypoints_number_found_data, run_accuracy_data, run_accuracy_data_firstpoint, run_accuracy_data_lastpoint, time_data,time_per_waypoint_data, run_accuracy_data_x, run_accuracy_data_y, waypoints_distance_data_x, waypoints_distance_data_y, run_accuracy_data_x_firstpoint, run_accuracy_data_y_firstpoint, run_accuracy_data_x_lastpoint, run_accuracy_data_y_lastpoint = calculate_processed_data(df, waypoints)
 
 # box_plot_data(waypoints_number_found_data, 'Number of Waypoints Found', 'Experiment', 'Number of Waypoints Found')
-# box_plot_data(run_accuracy_data, 'Average Distance to Waypoints', 'Experiment', 'Average Distance to Waypoints')
+box_plot_data(run_accuracy_data, 'Average Distance to Waypoints', 'Experiment', 'Average Distance to Waypoints')
 # box_plot_data(time_data, 'Time to Complete Experiment', 'Experiment', 'Time (s)')
 # box_plot_data(time_per_waypoint_data, 'Time per Waypoint', 'Experiment', 'Time per Waypoint (s)')
 # box_plot_data(run_accuracy_data_firstpoint, 'Distance to First Waypoint', 'Experiment', 'Distance to First Waypoint')
 # box_plot_data(run_accuracy_data_lastpoint, 'Distance to Last Waypoint', 'Experiment', 'Distance to Last Waypoint')
 # box_plot_data(run_accuracy_data_x, 'Average X Distance to Waypoints', 'Experiment', 'Average X Distance to Waypoints')
 # box_plot_data(run_accuracy_data_y, 'Average Y Distance to Waypoints', 'Experiment', 'Average Y Distance to Waypoints')
-box_plot_data(run_accuracy_data_x_firstpoint, 'X Distance to First Waypoint', 'Experiment', 'X Distance to First Waypoint')
-box_plot_data(run_accuracy_data_y_firstpoint, 'Y Distance to First Waypoint', 'Experiment', 'Y Distance to First Waypoint')
-box_plot_data(run_accuracy_data_x_lastpoint, 'X Distance to Last Waypoint', 'Experiment', 'X Distance to Last Waypoint')
-box_plot_data(run_accuracy_data_y_lastpoint, 'Y Distance to Last Waypoint', 'Experiment', 'Y Distance to Last Waypoint')
+# box_plot_data(run_accuracy_data_x_firstpoint, 'X Distance to First Waypoint', 'Experiment', 'X Distance to First Waypoint')
+# box_plot_data(run_accuracy_data_y_firstpoint, 'Y Distance to First Waypoint', 'Experiment', 'Y Distance to First Waypoint')
+# box_plot_data(run_accuracy_data_x_lastpoint, 'X Distance to Last Waypoint', 'Experiment', 'X Distance to Last Waypoint')
+# box_plot_data(run_accuracy_data_y_lastpoint, 'Y Distance to Last Waypoint', 'Experiment', 'Y Distance to Last Waypoint')
 
 # Plot the average distance to waypoints of each run
 # for key, value in waypoints_number_found_data.items():
