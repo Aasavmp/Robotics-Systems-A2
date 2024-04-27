@@ -52,7 +52,11 @@ def process_experiment_runs(df, waypoints):
                 original_xy_values = [tuple(map(float, xy.split(','))) for xy in xy_values if ',' in xy]
 
                 # Filter xy_values based on distance to waypoints
-                filtered_xy_values = [xy for xy in original_xy_values if any(distance(xy, wp) <= 0.025 for wp in waypoints)]
+                filtered_xy_values = [xy for xy in original_xy_values if any(distance(xy, wp) <= 0.03 for wp in waypoints)]
+
+                # Check if any of the filtered values are within 0.015 of each other
+                filtered_xy_values = [filtered_xy_values[0]] + [xy for i, xy in enumerate(filtered_xy_values[1:], 1) if distance(xy, filtered_xy_values[i - 1]) > 0.015]
+
                 experiments[dict_key][run_key] = filtered_xy_values
                 # store original coordinates and number of waypoints found
                 # experiments[dict_key][f'{run_key}_original_coordinates'] = original_xy_values
@@ -129,15 +133,14 @@ def calculate_processed_data(df, waypoints):
                 for xy in run_values:
                     for wp in waypoints:
                         dist = distance(xy, wp)
-                        if dist <= 0.025:
+                        if dist <= 0.03:
                             # Store the distance to waypoints
                             waypoints_distance_data[key][run_key].append(dist)
 
                             # Store the x and y distances to waypoints
                             waypoints_distance_data_x[key][run_key].append(abs(xy[0] - wp[0]))
                             waypoints_distance_data_y[key][run_key].append(abs(xy[1] - wp[1]))
-
-                # Store the number of waypoints found
+                    
                 waypoints_number_found_data[key].append(len(waypoints_distance_data[key][run_key]))
 
                 # Store the distance to the first and last waypoints
@@ -205,6 +208,43 @@ def plot_both_files(data_one, data_two, title, x_label, y_label):
     # Create a DataFrame from the data
     df_one = pd.DataFrame(data_one)
     df_two = pd.DataFrame(data_two)
+
+    # Combine the two DataFrames into one column-wise
+    df_combined = pd.concat([df_one, df_two], axis=0)
+
+    # Get the average number of waypoints for all experiments as one digit]
+    average_number_waypoints = np.mean([np.nanmean(lst) for lst in df_combined.values])
+
+    # Get the accuracy of each point in each column compared to a distacnce of 0 to the maximum distance
+    max_distance = max([np.nanmax(lst) for lst in df_combined.values])
+    # df_combined = 1 - (df_combined / max_distance)
+
+    # Get the accuracy of each point in each column compared to a distacnce of 0 to the maximum distance
+    # df_combined = 1 - (df_combined / max_distance)
+    df_combined = df_combined * 1000
+
+    average_accuracy = np.mean([np.nanmean(lst) for lst in df_combined.values])
+
+    average_number_waypoints = average_accuracy
+
+    # Increase the font size of everything
+    plt.rcParams.update({'font.size': 28})
+
+    # Create a box plot of the combined DataFrame with a thicker line
+    ax = df_combined.boxplot(rot=0, boxprops=dict(linewidth=2), whiskerprops=dict(linewidth=2), capprops=dict(linewidth=2), medianprops=dict(linewidth=3, color='red'))
+    
+    # Draw a horizontal line at the average number of waypoints
+    plt.axhline(y=average_number_waypoints, color='b', linestyle='--', linewidth=2, label='Average Distance to Waypoints')
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.legend()
+    # Make the labels vertical
+    plt.xticks(rotation=45)
+    # Fix the y axis to start from 0
+    ax.set_ylim(bottom=0)
+    # Display the plot
+    plt.show()
+    
     # Create a box plot for both files on the same graph but with different colors
     ax = df_one.boxplot(rot=0, positions=np.array(range(len(df_one.columns))) * 2.0, patch_artist=True, boxprops=dict(facecolor='blue'))
     df_two.boxplot(rot=0, positions=np.array(range(len(df_two.columns))) * 2.0 + 0.5, patch_artist=True, boxprops=dict(facecolor='red'))
@@ -217,17 +257,36 @@ def plot_both_files(data_one, data_two, title, x_label, y_label):
     ax.set_ylabel(y_label)
 
     # Make the labels vertical
-    plt.xticks(rotation=90)
+    plt.xticks(rotation=45)
 
     # Fix the y axis to start from 0
     ax.set_ylim(bottom=0)
     # Display the plot
     plt.show()
 
+# Function to create dataframe from the data
+def create_dataframe(data):
+    max_length = max(len(lst) for lst in data.values())
+    for key, lst in data.items():
+        if len(lst) < max_length:
+            data[key] = lst + [np.nan] * (max_length - len(lst))
+    
+    return pd.DataFrame(data)
+
 waypoints_found, waypoints_distance_data, waypoints_number_found_data, run_accuracy_data, run_accuracy_data_firstpoint, run_accuracy_data_lastpoint, time_data,time_per_waypoint_data, run_accuracy_data_x, run_accuracy_data_y, waypoints_distance_data_x, waypoints_distance_data_y, run_accuracy_data_x_firstpoint, run_accuracy_data_y_firstpoint, run_accuracy_data_x_lastpoint, run_accuracy_data_y_lastpoint = calculate_processed_data(df_one, waypoints_one)
 waypoints_found_two, waypoints_distance_data_two, waypoints_number_found_data_two, run_accuracy_data_two, run_accuracy_data_firstpoint_two, run_accuracy_data_lastpoint_two, time_data_two, time_per_waypoint_data_two, run_accuracy_data_x_two, run_accuracy_data_y_two, waypoints_distance_data_x_two, waypoints_distance_data_y_two, run_accuracy_data_x_firstpoint_two, run_accuracy_data_y_firstpoint_two, run_accuracy_data_x_lastpoint_two, run_accuracy_data_y_lastpoint_two = calculate_processed_data(df_two, waypoints_two)
 
-# lot_both_files(run_accuracy_data, run_accuracy_data_two, 'Average Distance to Waypoints', 'Experiment', 'Average Distance to Waypoints') 
+square_200_distance = 1309.566146 # mm
+square_400_distance = 913.7
+sine_200_distance = 913.744097
+sine_400_distance = 622.274630
+
+# Calculate the speed of each experiment
+print(time_data)
+
+
+# plot_both_files(run_accuracy_data, run_accuracy_data_two, 'Accuracy of Search', 'Experiment', 'Distance to Waypoint (mm)') 
+# plot_both_files(waypoints_number_found_data, waypoints_number_found_data_two, 'Number of Waypoints Found', 'Experiment', 'Number of Waypoints Found')
 # plot_both_files(time_data, time_data_two, 'Time to Complete Experiment', 'Experiment', 'Time (s)')
 # plot_both_files(time_per_waypoint_data, time_per_waypoint_data_two, 'Time per Waypoint', 'Experiment', 'Time per Waypoint (s)')
 # plot_both_files(run_accuracy_data_firstpoint, run_accuracy_data_firstpoint_two, 'Distance to First Waypoint', 'Experiment', 'Distance to First Waypoint')
@@ -258,3 +317,32 @@ waypoints_found_two, waypoints_distance_data_two, waypoints_number_found_data_tw
 
 # Output the processed data for verification
 # print(experiment_data)
+
+# Create dataframe of the first and last accuracy of each run
+# df_accuracy_first_one = create_dataframe(run_accuracy_data_firstpoint)
+# df_accuracy_last_one = create_dataframe(run_accuracy_data_lastpoint)
+# df_accuracy_first_two = create_dataframe(run_accuracy_data_firstpoint_two)
+# df_accuracy_last_two = create_dataframe(run_accuracy_data_lastpoint_two)
+
+# # Combine the first dataframes into one
+# df_accuracy_first = pd.concat([df_accuracy_first_one, df_accuracy_first_two], axis=0)
+# df_accuracy_last = pd.concat([df_accuracy_last_one, df_accuracy_last_two], axis=0)
+
+# # Get the average of each column
+# average_accuracy_first = df_accuracy_first.mean()
+# average_accuracy_last = df_accuracy_last.mean()
+
+# # Plot line graph of the average accuracy of the first and last waypoints
+# plt.rcParams.update({'font.size': 28})
+# plt.plot(average_accuracy_first*1000, label='First Waypoint Found', color='red', linewidth=3, marker='o', markersize=10)
+# plt.plot(average_accuracy_last*1000, label='Last Waypoint Found', color='blue', linewidth=3, marker='o', markersize=10)
+
+
+# # plt.title('Average Distance to Waypoints')
+# # gridlines
+# plt.grid()
+# plt.xlabel('Experiment')
+# plt.ylabel('Average Distance to Waypoints (mm)      ')
+# plt.legend()
+# plt.xticks(rotation=45)
+# plt.show()
