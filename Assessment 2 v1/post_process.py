@@ -221,11 +221,13 @@ def plot_both_files(data_one, data_two, title, x_label, y_label):
 
     # Get the accuracy of each point in each column compared to a distacnce of 0 to the maximum distance
     # df_combined = 1 - (df_combined / max_distance)
-    df_combined = df_combined * 1000
+    df_combined = df_combined*1000
 
     average_accuracy = np.mean([np.nanmean(lst) for lst in df_combined.values])
 
     average_number_waypoints = average_accuracy
+
+    print(average_number_waypoints)
 
     # Increase the font size of everything
     plt.rcParams.update({'font.size': 28})
@@ -234,7 +236,16 @@ def plot_both_files(data_one, data_two, title, x_label, y_label):
     ax = df_combined.boxplot(rot=0, boxprops=dict(linewidth=2), whiskerprops=dict(linewidth=2), capprops=dict(linewidth=2), medianprops=dict(linewidth=3, color='red'))
     
     # Draw a horizontal line at the average number of waypoints
-    plt.axhline(y=average_number_waypoints, color='b', linestyle='--', linewidth=2, label='Average Distance to Waypoints')
+    plt.axhline(y=average_number_waypoints, color='b', linestyle='--', linewidth=3, label='Overall Average Waypoint Error')
+
+    # Plot a line between the average of 3 consecutive experiments
+    mean_values = df_combined.mean()
+    for i in range(0, len(mean_values) - 2, 3):
+        if i == 0:
+            plt.plot([i+1, i + 3], [mean_values[i], mean_values[i + 2]], color='green', linewidth=3, linestyle='--', label='Average Waypoint Error Trend')
+        else:
+            plt.plot([i+1, i + 3], [mean_values[i], mean_values[i + 2]], color='green', linewidth=3, linestyle='--')
+
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
     ax.legend()
@@ -277,15 +288,105 @@ waypoints_found, waypoints_distance_data, waypoints_number_found_data, run_accur
 waypoints_found_two, waypoints_distance_data_two, waypoints_number_found_data_two, run_accuracy_data_two, run_accuracy_data_firstpoint_two, run_accuracy_data_lastpoint_two, time_data_two, time_per_waypoint_data_two, run_accuracy_data_x_two, run_accuracy_data_y_two, waypoints_distance_data_x_two, waypoints_distance_data_y_two, run_accuracy_data_x_firstpoint_two, run_accuracy_data_y_firstpoint_two, run_accuracy_data_x_lastpoint_two, run_accuracy_data_y_lastpoint_two = calculate_processed_data(df_two, waypoints_two)
 
 square_200_distance = 1309.566146 # mm
-square_400_distance = 913.7
-sine_200_distance = 913.744097
+square_400_distance = 913.744097
+sine_200_distance = 983.925563
 sine_400_distance = 622.274630
 
-# Calculate the speed of each experiment
-print(time_data)
+# Create a dataframe with the speed of each experiment using the time data
+df_time = create_dataframe(time_data)
+df_time_two = create_dataframe(time_data_two)
+df_accuracy_one = create_dataframe(run_accuracy_data)
+df_accuracy_two = create_dataframe(run_accuracy_data_two)
+df_waypoints_number_found = create_dataframe(waypoints_number_found_data)
+df_waypoints_number_found_two = create_dataframe(waypoints_number_found_data_two)
+
+# Combine the two DataFrames into one column-wise
+df_combined_time = pd.concat([df_time, df_time_two], axis=0)
+df_combined_accuracy = pd.concat([df_accuracy_one, df_accuracy_two], axis=0)
+df_combined_waypoints_number_found = pd.concat([df_waypoints_number_found, df_waypoints_number_found_two], axis=0)
+
+# Loop through the combined time DataFrame and calculate the speed of each experiment
+speed_data = {}
+for key, value in df_combined_time.items():
+    speed_data[key] = []
+    # Split the key into the search type, speed, amplitude and wavelength
+    searchtype, speed, amplitude, wavelength = key.split('_')
+    
+    # Use the distance depending on the search type and wavelength
+    if searchtype == 'Square':
+        if wavelength == '0.2':
+            distance = square_200_distance
+        else:
+            distance = square_400_distance
+    else:
+        if wavelength == '0.2':
+            distance = sine_200_distance
+        else:
+            distance = sine_400_distance
+
+    for time in value:
+        if time == 0 or math.isnan(time):
+            speed_data[key].append(np.nan)
+        else:
+            speed_data[key].append(distance / time)
+
+# Create a DataFrame from the speed data
+df_speed =  create_dataframe(speed_data)
+# Divide each column of the speed DataFrame by the corresponding column of the accuracy DataFrame
+df_speed = df_combined_waypoints_number_found/df_combined_accuracy
 
 
-# plot_both_files(run_accuracy_data, run_accuracy_data_two, 'Accuracy of Search', 'Experiment', 'Distance to Waypoint (mm)') 
+plt.rcParams.update({'font.size': 28})
+# Plot a graph of the accuracy of each experiment vs the number of waypoints found
+for key, value in df_combined_accuracy.items():
+    # Split the key into the search type, speed, amplitude and wavelength
+    searchtype, speed, amplitude, wavelength = key.split('_')
+
+    if wavelength == '0.2':
+        distance = 200
+    else:
+        distance = 400
+
+    if searchtype == 'Square':
+        label_string = f'{searchtype}, λ = {distance}mm'
+    else:
+        label_string = f'Sine, λ = {distance}mm'
+
+    # plt.scatter(np.mean(value), np.mean(df_combined_waypoints_number_found[key]), label=label_string, linewidths=3, marker='o', s=100)
+
+    # Annotate the points with the label string
+    # for i, txt in enumerate(value):
+    #     
+
+    # Create 
+
+# plt.legend(title='Experiment')
+
+# Double column the legend and place in the bottom left
+# plt.legend(title='Experiment', loc='lower left', bbox_to_anchor=(0, 0))
+# # plt.title('Accuracy of Search')
+# plt.xlabel('Average Waypoint Error (mm)')
+# plt.ylabel('Number of Waypoints Found')
+# plt.grid()
+# # Set the x and y axis to start from 0
+# plt.xlim(left=0)
+# plt.ylim(bottom=0)
+# plt.show()
+
+# Plot a 3 dimensional graph of the speed of each experiment vs the distance to waypoints vs the number of waypoints found
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# for key, value in df_speed.items():
+#     ax.scatter(np.mean(value), np.mean(df_combined_accuracy[key]), np.mean(df_combined_waypoints_number_found[key]), label=key)
+# ax.set_xlabel('Speed (mm/s)')
+# ax.set_ylabel('Distance to Waypoints (mm)')
+# ax.set_zlabel('Number of Waypoints Found')
+# # fix the z axis to start from 0
+# ax.set_zlim(bottom=0)
+# plt.legend(title='Experiment')
+# plt.show()
+
+plot_both_files(run_accuracy_data, run_accuracy_data_two, 'Accuracy of Search', 'Experiment', 'Waypoint Error (mm)') 
 # plot_both_files(waypoints_number_found_data, waypoints_number_found_data_two, 'Number of Waypoints Found', 'Experiment', 'Number of Waypoints Found')
 # plot_both_files(time_data, time_data_two, 'Time to Complete Experiment', 'Experiment', 'Time (s)')
 # plot_both_files(time_per_waypoint_data, time_per_waypoint_data_two, 'Time per Waypoint', 'Experiment', 'Time per Waypoint (s)')
@@ -342,7 +443,8 @@ print(time_data)
 # # gridlines
 # plt.grid()
 # plt.xlabel('Experiment')
-# plt.ylabel('Average Distance to Waypoints (mm)      ')
+# plt.ylabel('Average Waypoint Error (mm)')
+# plt.ylim(bottom=0)
 # plt.legend()
 # plt.xticks(rotation=45)
 # plt.show()
