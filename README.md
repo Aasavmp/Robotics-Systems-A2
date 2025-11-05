@@ -5,7 +5,7 @@ This repo looks at development of code to control a 3PI+ robot, create a test en
 ### Balancing Speed, Accuracy, and Thoroughness in Autonomous Navigation Systems
 
 **Authors:** Aasav Patel & Frank Panton  
-**Full Report:** [Robotic_Systems_A2_Report.pdf](./Assessment%202%20v1/Submission%20folder/Robotic_Systems_A2_Report.pdf)
+**Full Report:** [Robotic_Systems_A2_Report.pdf](./Assessment%202%20v1/Submission%20Folder/Robotic_Systems_A2_Report.pdf)
 
 ---
 
@@ -122,4 +122,4 @@ This demonstrates that the ideal parameters depend on task priorities—coverage
 
 ---
 
-> 📘 **Full Report:** [Robotic_Systems_A2_Report.pdf](./Assessment%202%20v1/Submission%20folder/Robotic_Systems_A2_Report.pdf)
+> 📘 **Full Report:** [Robotic_Systems_A2_Report.pdf](./Assessment%202%20v1/Submission%20Folder/Robotic_Systems_A2_Report.pdf)
