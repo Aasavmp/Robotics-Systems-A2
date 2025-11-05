@@ -27,7 +27,7 @@ The robot was programmed to follow **sine** and **square** wave search paths at 
 ### Line Sensor Geometry
 Each line sensor’s offset from the robot centre was accounted for to improve waypoint localisation accuracy.
 
-![Line Sensor Schematic](./Assessment%202%20v1/Line%20Sensor%20schmatics.png)
+![Line Sensor Schematic](./Assessment%202%20v1/Line%20Sensor%20schematics.png)
 
 ### Test Environment
 Two A3 sheets with 10 random black waypoints each were used for testing consistency.
